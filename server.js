@@ -1,21 +1,28 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-// تأكد من وجود ملف db.js الذي يحتوي على دالة connectDB()
 const connectDB = require('./db'); 
 
-// تأكد من تثبيت الحزم المطلوبة: npm install express cors dotenv mongoose jsonwebtoken bcryptjs
+// 1. تحميل متغيرات البيئة (مثل MONGO_URI و JWT_SECRET و CORS_ORIGIN)
+dotenv.config(); 
 
-dotenv.config();
-connectDB(); // الاتصال بقاعدة البيانات
+// 2. الاتصال بقاعدة البيانات
+connectDB(); 
 
 const app = express();
 
-// Middlewares
-app.use(cors()); // السماح بالاتصال من الواجهة الأمامية (Firebase Hosting)
-app.use(express.json()); // السماح بتحليل بيانات JSON المرسلة في الطلبات
+// 3. Middlewares (البرامج الوسيطة)
+// *****************************************************************
+// الحل لمشكلة الاتصال: استخدام متغير البيئة CORS_ORIGIN
+app.use(cors({
+    origin: process.env.CORS_ORIGIN, // يقرأ 'https://adgainpro.web.app' من Render
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+}));
+// *****************************************************************
+app.use(express.json()); // يسمح بقراءة بيانات JSON
 
-// Import Routes (جميع مسارات النظام)
+// 4. استيراد المسارات (Routes)
 const authRoutes = require('./routes/auth');
 const adRoutes = require('./routes/ads');
 const userRoutes = require('./routes/user');
@@ -23,7 +30,7 @@ const taskRoutes = require('./routes/tasks');
 const dailyRoutes = require('./routes/daily');
 const adminRoutes = require('./routes/admin'); 
 
-// Use Routes
+// 5. استخدام المسارات
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/user', userRoutes);
@@ -31,12 +38,13 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/daily', dailyRoutes);
 app.use('/api/admin', adminRoutes); 
 
-// Root Route
+// 6. مسار الجذر
 app.get('/', (req, res) => {
     res.send('AdGain Pro API is running.');
 });
 
-// هذا هو التعديل الهام: استخدام البورت الذي يوفره نظام الاستضافة
+// 7. تشغيل الخادم
+// يستخدم البورت الذي يوفره نظام الاستضافة (Render)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

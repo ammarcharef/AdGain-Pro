@@ -9,13 +9,26 @@ const AD_BASE_XP = 5; // نقاط الخبرة الأساسية لكل مشاه�
 // @access  Private
 exports.getAvailableAds = async (req, res) => {
     try {
-        // جلب الإعلانات النشطة التي لا تزال لديها مشاهدات متبقية
+        // تم تخفيف الشروط مؤقتاً: نكتفي بالبحث عن الإعلانات النشطة ذات المشاهدات المتبقية > 0
         const ads = await Ad.find({ isActive: true, remainingViews: { $gt: 0 } }).select('-__v');
+        
+        // التحقق من نوع البيانات
+        if (!Array.isArray(ads)) {
+             console.error('Ad query did not return an array');
+             return res.json([]); // إرجاع قائمة فارغة إذا فشلت المونجوس في الإرجاع
+        }
+        
         res.json(ads);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error("Error in getAvailableAds:", err.message);
+        // إرجاع رسالة خطأ واضحة إذا فشل الكود
+        res.status(500).json({ msg: 'Server error during ad fetching.' });
     }
+};
+
+// ... (بقية الدالة registerAdView تبقى كما هي)
+exports.registerAdView = async (req, res) => {
+    // ...
 };
 
 // @route   POST api/ads/view/:adId

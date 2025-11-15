@@ -6,11 +6,18 @@ const User = require('../models/User');
 // @access  Private
 exports.getAvailableTasks = async (req, res) => {
     try {
+        // تخفيف شروط التصفية مؤقتاً لضمان العرض
         const tasks = await Task.find({ isActive: true, remainingCompletions: { $gt: 0 } }).select('-__v');
+        
+        if (!Array.isArray(tasks)) {
+             console.error('Task query did not return an array');
+             return res.json([]);
+        }
+        
         res.json(tasks);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
+        console.error("Error in getAvailableTasks:", err.message);
+        res.status(500).json({ msg: 'Server error during task fetching.' });
     }
 };
 
