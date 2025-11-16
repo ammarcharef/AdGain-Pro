@@ -10,7 +10,6 @@ module.exports = function (req, res, next) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        // التحقق من أن التوكن خاص بالمعلن وليس بالمستخدم
         if (decoded.advertiser && decoded.advertiser.id) {
             req.advertiser = decoded.advertiser;
             next();

@@ -4,39 +4,39 @@ const dotenv = require('dotenv');
 const connectDB = require('./db'); 
 
 // 1. تحميل متغيرات البيئة (MONGO_URI, JWT_SECRET, CORS_ORIGIN)
-dotenv.config(); 
+dotenv.config(); 
 
 // 2. الاتصال بقاعدة البيانات
-connectDB(); 
+connectDB(); 
 
 const app = express();
 
 // 3. Middlewares (البرامج الوسيطة)
-// حل مشكلة CORS: يستخدم متغير البيئة للسماح بالوصول من نطاق Firebase
+// يستخدم متغير البيئة للسماح بالوصول من نطاق Firebase
 app.use(cors({
     origin: process.env.CORS_ORIGIN, 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
 }));
-app.use(express.json()); // يسمح بقراءة بيانات JSON
+app.use(express.json()); 
 
-// 4. استيراد المسارات (Routes) - تم تجميع كل الاستيرادات هنا
+// 4. استيراد المسارات (Routes) - تم تجميعها ومنع التكرار
 const authRoutes = require('./routes/auth');
 const adRoutes = require('./routes/ads');
 const userRoutes = require('./routes/user');
 const taskRoutes = require('./routes/tasks');
 const dailyRoutes = require('./routes/daily');
-const adminRoutes = require('./routes/admin'); // الاستيراد مرة واحدة
-const advertiserRoutes = require('./routes/advertiser'); // الاستيراد مرة واحدة
+const adminRoutes = require('./routes/admin');
+const advertiserRoutes = require('./routes/advertiser');
 
-// 5. استخدام المسارات (Apply Routes) - تم تجميع كل التعيينات هنا
+// 5. استخدام المسارات (Apply Routes) - تم تجميعها ومنع التكرار
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/daily', dailyRoutes);
-app.use('/api/admin', adminRoutes);  // تعيين مسار المدير
-app.use('/api/advertiser', advertiserRoutes); // تعيين مسار المعلن
+app.use('/api/admin', adminRoutes);
+app.use('/api/advertiser', advertiserRoutes);
 
 // 6. مسار الجذر
 app.get('/', (req, res) => {
@@ -44,7 +44,6 @@ app.get('/', (req, res) => {
 });
 
 // 7. تشغيل الخادم
-// يستخدم البورت الذي يوفره نظام الاستضافة (Render)
-const PORT = process.env.PORT || 10000; // استخدم 10000 أو 5000 كبديل محلي
+const PORT = process.env.PORT || 10000; 
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
