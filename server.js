@@ -48,3 +48,21 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+// ...
+const adminRoutes = require('./routes/admin'); 
+const advertiserRoutes = require('./routes/advertiser'); // جديد
+
+// Use Routes
+// ...
+app.use('/api/admin', adminRoutes); 
+app.use('/api/advertiser', advertiserRoutes); // جديد
+
+// Import Routes
+// ...
+const advertiserRoutes = require('./routes/advertiser'); // جديد
+
+// Use Routes
+// ...
+app.use('/api/advertiser', advertiserRoutes); // جديد
+// ...
