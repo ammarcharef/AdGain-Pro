@@ -4,24 +4,16 @@ const bcrypt = require('bcryptjs');
 exports.getDashboard = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
-        }
+        if (!user) { return res.status(404).json({ msg: 'User not found' }); }
         
         const nextLevelXP = 100 * Math.pow(user.level, 1.5);
         
         res.json({
-            username: user.username,
-            email: user.email,
+            // ... (بقية البيانات)
             balance: user.balance.toFixed(2),
-            withdrawalAccount: user.withdrawalAccount,
-            referralCode: user.referralCode,
             level: user.level,
             xp: user.xp,
             nextLevelXP: nextLevelXP,
-            lastDailyCheckIn: user.lastDailyCheckIn,
-            
-            // إضافة حقول الدفع لتبسيط واجهة السحب
             paymentMethod: user.paymentMethod,
             paymentAccount: user.paymentAccount
         });
@@ -31,23 +23,20 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
+// دالة تحديث الملف الشخصي وتعيين كلمة مرور السحب
 exports.updateProfile = async (req, res) => {
     const userId = req.user.id;
     const { paymentMethod, paymentAccount, newWithdrawalPass } = req.body; 
 
     try {
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
-        }
+        if (!user) { return res.status(404).json({ msg: 'User not found' }); }
 
         const updateFields = {};
 
-        // تحديث تفاصيل الدفع
         if (paymentMethod) updateFields.paymentMethod = paymentMethod;
         if (paymentAccount) updateFields.paymentAccount = paymentAccount;
 
-        // تحديث كلمة مرور السحب وتشفيرها
         if (newWithdrawalPass) {
             const salt = await bcrypt.genSalt(10);
             updateFields.withdrawalPassword = await bcrypt.hash(newWithdrawalPass, salt);
