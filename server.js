@@ -27,9 +27,9 @@ const userRoutes = require('./routes/user');
 const taskRoutes = require('./routes/tasks');
 const dailyRoutes = require('./routes/daily');
 const adminRoutes = require('./routes/admin');
-const advertiserRoutes = require('./routes/advertiser');
+const advertiserRoutes = require('./routes/advertiser'); // مسارات المعلنين
 
-// 5. استخدام المسارات (Apply Routes) - تم تجميعها ومنع التكرار
+// 5. استخدام المسارات (Apply Routes)
 app.use('/api/auth', authRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/user', userRoutes);

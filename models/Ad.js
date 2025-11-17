@@ -29,6 +29,12 @@ const AdSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    // ربط الإعلان بالمعلن الذي قام بإنشائه (ميزة المعلنين الجديدة)
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Advertiser', // يشير إلى نموذج المعلنين
+        required: false // يمكن أن يكون فارغًا للإعلانات التي يضيفها المدير يدوياً
     }
 }, { timestamps: true });
 
