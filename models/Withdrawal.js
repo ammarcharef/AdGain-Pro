@@ -9,14 +9,14 @@ const WithdrawalSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true,
-        min: 500 // الحد الأدنى للسحب (500 د.ج)
+        min: 500 
     },
     paymentMethod: {
         type: String,
         enum: ['CCP', 'BANK', 'PAYPAL', 'PAYEER'],
         required: true
     },
-    accountDetails: { // رقم CCP أو رقم الحساب البنكي
+    accountDetails: { 
         type: String,
         required: true
     },

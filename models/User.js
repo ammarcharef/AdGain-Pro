@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    withdrawalAccount: { // رقم حساب السحب (CCP/Bank) للتحقق الأمني
+    withdrawalAccount: { // الحقل الذي كان يُستخدم للتسجيل (لأغراض أمنية)
         type: String,
         required: true, 
         unique: true, 
@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    // الحقول الجديدة لنظام السحب (يجب أن يحددها المستخدم قبل السحب)
+    // الحقول الجديدة لنظام السحب الآمن
     paymentMethod: {
         type: String,
         enum: ['CCP', 'BANK', 'PAYPAL', 'PAYEER'],
@@ -62,6 +62,10 @@ const UserSchema = new mongoose.Schema({
     paymentAccount: { // رقم الحساب أو الإيميل الفعلي الذي سيتم الدفع عليه
         type: String,
     },
+    withdrawalPassword: { // كلمة مرور السحب المشفرة
+        type: String,
+        default: null
+    }
 }, { timestamps: true });
 
 UserSchema.methods.levelUp = function() {
