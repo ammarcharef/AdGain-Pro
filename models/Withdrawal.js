@@ -9,21 +9,21 @@ const WithdrawalSchema = new mongoose.Schema({
     amount: {
         type: Number,
         required: true,
-        min: 10
+        min: 500 // الحد الأدنى للسحب (500 د.ج)
     },
-    accountDetails: { // لضمان تسجيل الحساب الذي تم السحب عليه
+    paymentMethod: {
+        type: String,
+        enum: ['CCP', 'BANK', 'PAYPAL', 'PAYEER'],
+        required: true
+    },
+    accountDetails: { // رقم CCP أو رقم الحساب البنكي
         type: String,
         required: true
     },
     status: {
         type: String,
-        enum: ['Pending', 'Processed', 'Rejected'],
+        enum: ['Pending', 'Processing', 'Paid', 'Rejected'],
         default: 'Pending'
-    },
-    processedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: null // يجب أن يكون حساب المالك أو المدير
     },
     processedAt: {
         type: Date

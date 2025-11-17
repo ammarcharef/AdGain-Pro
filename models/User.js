@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    withdrawalAccount: { // يُستخدم كآلية أمان لمنع الاحتيال
+    withdrawalAccount: { // رقم حساب السحب (CCP/Bank) للتحقق الأمني
         type: String,
         required: true, 
         unique: true, 
@@ -37,7 +37,6 @@ const UserSchema = new mongoose.Schema({
         ref: 'User',
         default: null
     },
-    // نظام المستويات والخبرة (XP)
     level: {
         type: Number,
         default: 1
@@ -46,25 +45,29 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    // المكافآت اليومية
     lastDailyCheckIn: {
         type: Date,
         default: null
     },
-    // صلاحية الإدارة (لتحديد حساب المالك)
     isAdmin: {
         type: Boolean,
         default: false
-    }
+    },
+    // الحقول الجديدة لنظام السحب (يجب أن يحددها المستخدم قبل السحب)
+    paymentMethod: {
+        type: String,
+        enum: ['CCP', 'BANK', 'PAYPAL', 'PAYEER'],
+        default: 'CCP' 
+    },
+    paymentAccount: { // رقم الحساب أو الإيميل الفعلي الذي سيتم الدفع عليه
+        type: String,
+    },
 }, { timestamps: true });
 
-// منطق المستويات (حساب XP المطلوبة للمستوى التالي)
 UserSchema.methods.levelUp = function() {
-    // XP المطلوبة للمستوى التالي: 100 * (المستوى الحالي)^1.5
     const nextLevelXP = 100 * Math.pow(this.level, 1.5);
     if (this.xp >= nextLevelXP) {
         this.level += 1;
-        // الاحتفاظ بالـ XP المتبقية بعد رفع المستوى
         this.xp -= nextLevelXP; 
         console.log(`User ${this.username} leveled up to ${this.level}`);
         return true;
@@ -74,10 +77,9 @@ UserSchema.methods.levelUp = function() {
 
 UserSchema.pre('save', function(next) {
     if (this.isModified('xp') && this.xp > 0) {
-        this.levelUp(); // التحقق من رفع المستوى عند تعديل XP
+        this.levelUp();
     }
     if (!this.referralCode) {
-        // إنشاء رمز إحالة تلقائي
         this.referralCode = this.username.toLowerCase().slice(0, 5) + Math.random().toString(36).substring(2, 7);
     }
     next();
