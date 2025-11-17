@@ -9,36 +9,35 @@ const AdSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    rewardAmount: { // الأجر المعلوم الذي يتقاضاه المستخدم
+    rewardAmount: { 
         type: Number,
         required: true,
         min: 0.01 
     },
     viewDuration: {
         type: Number,
-        required: true, // المدة اللازمة للمشاهدة بالثواني
+        required: true,
         min: 5
     },
-    totalViews: { // إجمالي عدد المشاهدات المشتراة
+    totalViews: { 
         type: Number,
         required: true
     },
-    remainingViews: { // المشاهدات المتبقية (يتم خصمها)
+    remainingViews: { 
         type: Number
     },
     isActive: {
         type: Boolean,
         default: true
     },
-    // ربط الإعلان بالمعلن الذي قام بإنشائه (ميزة المعلنين الجديدة)
+    // ربط الإعلان بالمعلن الذي قام بإنشائه (ميزة المعلنين)
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Advertiser', // يشير إلى نموذج المعلنين
-        required: false // يمكن أن يكون فارغًا للإعلانات التي يضيفها المدير يدوياً
+        ref: 'Advertiser', 
+        required: false 
     }
 }, { timestamps: true });
 
-// يتم تعيين remainingViews كـ totalViews عند الإنشاء
 AdSchema.pre('save', function(next) {
     if (this.isNew) {
         this.remainingViews = this.totalViews;

@@ -1,9 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs'); 
 
-// @route   GET api/user/dashboard
-// @desc    Get user profile and balance
-// @access  Private
 exports.getDashboard = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
@@ -34,9 +31,6 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-// @route   PUT api/user/
-// @desc    Update user profile details, payment info, or set withdrawal password
-// @access  Private
 exports.updateProfile = async (req, res) => {
     const userId = req.user.id;
     const { paymentMethod, paymentAccount, newWithdrawalPass } = req.body; 

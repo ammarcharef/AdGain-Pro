@@ -4,11 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const MIN_WITHDRAWAL_AMOUNT = 500.00; 
 
-// @route   POST api/user/withdraw
-// @desc    Request a withdrawal with security check
-// @access  Private
 exports.requestWithdrawal = async (req, res) => {
-    // نتوقع الآن فقط المبلغ وكلمة مرور السحب
     const { amount, withdrawalPass } = req.body;
     const userId = req.user.id;
 
