@@ -349,3 +349,4 @@ bot.on('callback_query', async (query) => {
 });
 
 console.log("Telegram Bot (Full Platform) is running...");
+
