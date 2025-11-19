@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./db'); 
-const path = require('path');
+
+// تشغيل البوت (العقل المدبر الجديد)
+require('./bot'); 
 
 dotenv.config(); 
 connectDB(); 
@@ -17,31 +19,21 @@ app.use(cors({
 }));
 app.use(express.json()); 
 
-// Import Routes
-const authRoutes = require('./routes/auth');
-const adRoutes = require('./routes/ads');
-const userRoutes = require('./routes/user');
-const taskRoutes = require('./routes/tasks');
-const dailyRoutes = require('./routes/daily');
+// Import Routes (فقط للمدير والمعلنين)
+const authRoutes = require('./routes/auth'); // نحتاجه لتسجيل دخول المدير فقط
 const adminRoutes = require('./routes/admin');
 const advertiserRoutes = require('./routes/advertiser');
 
 // Use Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/ads', adRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/daily', dailyRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/advertiser', advertiserRoutes);
+app.use('/api/auth', authRoutes); // لتسجيل دخول المدير/المعلن
+app.use('/api/admin', adminRoutes); // لوحة التحكم الخاصة بك
+app.use('/api/advertiser', advertiserRoutes); // لوحة المعلنين
 
 // مسار الجذر
 app.get('/', (req, res) => {
-    res.send('AdGain Pro API is running.');
+    res.send('AdGain Pro Bot Platform is Running 🤖');
 });
 
 const PORT = process.env.PORT || 10000; 
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-// تشغيل بوت تليجرام
-require('./bot');
