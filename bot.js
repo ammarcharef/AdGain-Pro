@@ -89,15 +89,153 @@ const cancelMenu = {
 // **************************************************
 
 // 1. البداية
-bot.onText(/\/start/, async (msg) => {
-    const chatId = msg.chat.id;
+bot.onText(/\/admin/, async (msg) => {
+    const chatId = msg.chat.id.toString();
+
+    // التحقق من أن المرسل هو المدير
+    if (chatId !== ADMIN_CHAT_ID) {
+        bot.sendMessage(chatId, "⛔ هذا الأمر مخصص للمدير فقط.");
+        return;
+    }
+
     try {
-        const user = await getOrCreateUser(msg);
-        bot.sendMessage(chatId, `👋 أهلاً بك يا ${msg.from.first_name} في منصة AdGain Pro!\n\nاجمع الأرباح من هاتفك بسهولة. 🇩🇿`, mainMenu);
+        const totalUsers = await User.countDocuments();
+        const pendingWithdrawals = await Withdrawal.countDocuments({ status: 'Pending' });
+        const activeAds = await Ad.countDocuments({ isActive: true });
+
+        const statsMsg = `
+👑 **لوحة تحكم المدير**
+
+👥 المستخدمين: ${totalUsers}
+📄 طلبات السحب المعلقة: ${pendingWithdrawals}
+📺 الإعلانات النشطة: ${activeAds}
+
+اختر إجراءً:
+        `;
+
+        bot.sendMessage(chatId, statsMsg, {
+            parse_mode: "Markdown",
+            reply_markup: {
+                inline_keyboard: [
+                    [{ text: "💸 مراجعة طلبات السحب", callback_data: "admin_check_withdrawals" }],
+                    [{ text: "➕ إضافة رصيد لمستخدم", callback_data: "admin_add_balance" }] // يمكن برمجتها لاحقاً
+                ]
+            }
+        });
     } catch (error) {
-        console.error(error);
+        bot.sendMessage(chatId, "حدث خطأ في جلب البيانات.");
     }
 });
+3. معالجة أزرار المدير (في قسم Callback Query)
+أضف هذا المنطق داخل دالة bot.on('callback_query', ...) الموجودة في أسفل الملف، قبل إغلاق القوس الأخير للدالة:
+
+JavaScript
+
+    // --- منطق المدير ---
+    
+    // عرض قائمة طلبات السحب
+    if (data === 'admin_check_withdrawals') {
+        if (chatId.toString() !== ADMIN_CHAT_ID) return;
+
+        const withdrawals = await Withdrawal.find({ status: 'Pending' }).populate('user');
+        
+        if (withdrawals.length === 0) {
+            bot.sendMessage(chatId, "✅ لا توجد طلبات سحب معلقة حالياً.");
+            return;
+        }
+
+        for (const w of withdrawals) {
+            const msgText = `
+🚨 **طلب سحب جديد**
+👤 المستخدم: ${w.user ? w.user.username : 'مجهول'}
+💰 المبلغ: ${w.amount} د.ج
+🏦 الطريقة: ${w.paymentMethod}
+📝 الحساب: \`${w.accountDetails}\`
+            `;
+            
+            await bot.sendMessage(chatId, msgText, {
+                parse_mode: "Markdown",
+                reply_markup: {
+                    inline_keyboard: [[
+                        { text: "✅ تم الدفع (موافقة)", callback_data: `approve_${w._id}` },
+                        { text: "❌ رفض الطلب", callback_data: `reject_${w._id}` }
+                    ]]
+                }
+            });
+        }
+    }
+
+    // الموافقة على السحب
+    if (data.startsWith('approve_')) {
+        const wId = data.split('_')[1];
+        try {
+            const withdrawal = await Withdrawal.findById(wId).populate('user');
+            if (withdrawal && withdrawal.status === 'Pending') {
+                withdrawal.status = 'Paid';
+                withdrawal.processedAt = Date.now();
+                await withdrawal.save();
+
+                // إشعار المدير
+                bot.editMessageText(`✅ **تم تأكيد الدفع لهذا الطلب.**\nالمستخدم: ${withdrawal.user.username}\nالمبلغ: ${withdrawal.amount}`, {
+                    chat_id: chatId,
+                    message_id: query.message.message_id,
+                    parse_mode: "Markdown"
+                });
+
+                // إشعار المستخدم (الذي طلب السحب) بأن المال وصل!
+                // نبحث عن chatId المستخدم من خلال اسمه (لأننا خزننا المعرف في username كـ Tg_12345)
+                const userTelegramId = withdrawal.user.username.replace('Tg_', '');
+                bot.sendMessage(userTelegramId, `🎉 **مبروك!**\n\nتمت الموافقة على طلب السحب الخاص بك بقيمة ${withdrawal.amount} د.ج.\nراجع حسابك البنكي/البريدي.`);
+            } else {
+                bot.answerCallbackQuery(query.id, { text: "الطلب معالج مسبقاً." });
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // رفض السحب
+    if (data.startsWith('reject_')) {
+        const wId = data.split('_')[1];
+        try {
+            const withdrawal = await Withdrawal.findById(wId).populate('user');
+            if (withdrawal && withdrawal.status === 'Pending') {
+                withdrawal.status = 'Rejected';
+                await withdrawal.save();
+
+                // إعادة الرصيد للمستخدم
+                withdrawal.user.balance += withdrawal.amount;
+                await withdrawal.user.save();
+
+                bot.editMessageText(`❌ **تم رفض الطلب وإعادة الرصيد.**`, {
+                    chat_id: chatId,
+                    message_id: query.message.message_id,
+                    parse_mode: "Markdown"
+                });
+                
+                const userTelegramId = withdrawal.user.username.replace('Tg_', '');
+                bot.sendMessage(userTelegramId, `⚠️ **تنبيه:**\nتم رفض طلب السحب الخاص بك وإعادة الرصيد لمحفظتك.\nيرجى التأكد من صحة معلومات الدفع.`);
+            }
+        } catch (e) { console.error(e); }
+    }
+📱 النتيجة: تحكم كامل من هاتفك
+بهذا التعديل، أنت لم تعد بحاجة لأي موقع ويب (Frontend) نهائياً!
+
+للمستخدمين: يربحون ويسحبون عبر البوت.
+
+لك (المدير):
+
+تفتح البوت في تليجرام.
+
+تكتب /admin.
+
+تضغط زر "مراجعة طلبات السحب".
+
+تأخذ رقم الـ CCP وتذهب لتطبيق بريدي موب (في هاتفك) وترسل المال.
+
+ترجع للبوت وتضغط "✅ تم الدفع".
+
+البوت يرسل رسالة مبروك للمستخدم تلقائياً.
+
+هذا هو الحل الأمثل لإدارة "AdGain Pro" من الأندرويد 100%.
 
 // 2. الاستماع للرسائل النصية
 bot.on('message', async (msg) => {
