@@ -3,37 +3,32 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./db'); 
 
-// تشغيل البوت (العقل المدبر الجديد)
-require('./bot'); 
+// --- تشغيل البوتات ---
+// 1. بوت المستخدمين (واجهة العمل)
+require('./userBot'); 
+// 2. بوت الإدارة (واجهة التحكم وتوزيع المال)
+require('./adminBot'); 
 
 dotenv.config(); 
 connectDB(); 
 
 const app = express();
 
-// Middlewares
-app.use(cors({
-    origin: process.env.CORS_ORIGIN, 
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-}));
+// (بقية إعدادات الـ Server والـ Postback تبقى كما هي...)
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
 app.use(express.json()); 
 
-// Import Routes (فقط للمدير والمعلنين)
-const authRoutes = require('./routes/auth'); // نحتاجه لتسجيل دخول المدير فقط
-const adminRoutes = require('./routes/admin');
-const advertiserRoutes = require('./routes/advertiser');
+// مسار استلام الأرباح من الشركات (Postback)
+const User = require('./models/User');
+const USER_SHARE = 0.70; // نسبة المستخدم
 
-// Use Routes
-app.use('/api/auth', authRoutes); // لتسجيل دخول المدير/المعلن
-app.use('/api/admin', adminRoutes); // لوحة التحكم الخاصة بك
-app.use('/api/advertiser', advertiserRoutes); // لوحة المعلنين
+app.get('/api/postback/:network', async (req, res) => {
+    // ... (نفس كود الـ Postback الذي كتبناه سابقاً) ...
+});
 
-// مسار الجذر
 app.get('/', (req, res) => {
-    res.send('AdGain Pro Bot Platform is Running 🤖');
+    res.send('🚀 AdGain Pro System (User Bot + Admin Bot) is Running!');
 });
 
 const PORT = process.env.PORT || 10000; 
-
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
