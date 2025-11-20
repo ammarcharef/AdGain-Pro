@@ -1,7 +1,7 @@
 {
-  "name": "adgain-pro-bot",
-  "version": "2.0.0",
-  "description": "Professional Telegram Bot Platform for AdGain Pro",
+  "name": "adgain-pro-bot-v2",
+  "version": "2.1.0",
+  "description": "Final production code for AdGain Pro Telegram Bot Platform.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
