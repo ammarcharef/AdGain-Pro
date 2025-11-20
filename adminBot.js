@@ -5,7 +5,7 @@ const userBot = require('./userBot'); // استيراد بوت المستخدم�
 
 // توكن بوت الإدارة (توكن 2 - مختلف)
 const token = '8435179479:AAHlrrNQurj5V7cDUd2qTpR2obY6eu7G_NM'; 
-const ADMIN_ID = '2140385904'; // معرفك الرقمي
+const ADMIN_ID = '7303861905'; // معرفك الرقمي
 
 const adminBot = new TelegramBot(token, { polling: true });
 
