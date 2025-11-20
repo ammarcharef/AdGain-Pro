@@ -3,10 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./db'); 
 
-// 1. تشغيل البوتات (يجب أن يكون لكل منهما توكن مختلف)
-const userBot = require('./userBot'); // بوت المستخدمين
-const adminBot = require('./adminBot'); // بوت الإدارة
-
 dotenv.config(); 
 connectDB(); 
 
@@ -14,9 +10,15 @@ const app = express();
 app.use(cors());
 app.use(express.json()); 
 
-// مسار صحي للبقاء على قيد الحياة (Health Check)
+// تشغيل بوت المستخدمين وبوت الإدارة عبر إرسال التوكنات من Render
+// يجب أن يكون لديك توكنان مختلفان في إعدادات Render
+const userBot = require('./userBot'); 
+const adminBot = require('./adminBot'); 
+
+// ... (بقية منطق Express)
+
 app.get('/', (req, res) => {
-    res.status(200).send('✅ AdGain Pro Bot System is Active & Running.');
+    res.status(200).send('✅ AdGain Pro System is Active & Running.');
 });
 
 const PORT = process.env.PORT || 10000; 
