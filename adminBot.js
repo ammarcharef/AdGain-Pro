@@ -4,7 +4,7 @@ const User = require('./models/User');
 const userBot = require('./userBot'); // استيراد بوت المستخدمين
 
 // توكن بوت الإدارة (توكن 2 - مختلف)
-const token = 'YOUR_ADMIN_BOT_TOKEN_2'; 
+const token = '8395295117:AAFshMR9fK46kSYL4GpKYYcpORXRJOENwzk'; 
 const ADMIN_ID = '2140385904'; // معرفك الرقمي
 
 const adminBot = new TelegramBot(token, { polling: true });
