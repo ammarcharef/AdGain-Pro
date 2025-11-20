@@ -6,7 +6,7 @@ const User = require('./models/User');
 // **************************************************
 // 1. الإعدادات والتهيئة
 // **************************************************
-const token = '8294794453:AAHDM0ujjbKZrJsA53Oh844Rfa8BxCwTAGc'; 
+const token = '8209432481:AAHwZ7zU8ABj3BNXA-cPrHfJiv3KWxSJ_Jo'; 
 
 // يجب أن يكون التعريف والتنفيذ في هذا المكان
 const bot = new TelegramBot(token, { polling: true }); 
