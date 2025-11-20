@@ -1,58 +1,51 @@
-const TelegramBot = require('node-telegram-bot-api');
-const User = require('./models/User');
-const Ad = require('./models/Ad');
-const Task = require('./models/Task');
-const Withdrawal = require('./models/Withdrawal');
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const connectDB = require('./db'); 
+
+// 1. استيراد البوتات ككائنات (Objects)
+const userBot = require('./userBot'); 
+const adminBot = require('./adminBot'); 
+
+dotenv.config(); 
+connectDB(); 
+
+const app = express();
+app.use(cors());
+app.use(express.json()); 
 
 // **************************************************
-// 1. الإعدادات والتهيئات
+// 2. إعداد Webhooks (الخطوة الحاسمة للاستقرار)
 // **************************************************
-const token = process.env.TELEGRAM_TOKEN_USER; 
 
-// إنشاء البوت بدون Polling
-const bot = new TelegramBot(token); 
-const userStates = {}; 
-const MIN_WITHDRAWAL = 500;
-const mainMenu = { /* ... (نفس القائمة السابقة) ... */ };
-const cancelMenu = { /* ... (نفس قائمة الإلغاء السابقة) ... */ };
+const WEBHOOK_URL = process.env.WEBHOOK_URL; // مثال: https://adgain-pro-t07e.onrender.com
 
-// **************************************************
-// 2. الدوال المساعدة (Helpers)
-// **************************************************
-// ... (دوال getOrCreateUser, showAds, showTasks) ... (يجب أن تكون موجودة)
-
-// **************************************************
-// 3. دالة عملية السحب (State Machine)
-// **************************************************
-async function handleWithdrawalFlow(chatId, text, msg) {
-    // ... (منطق السحب الكامل كما في الكود السابق) ...
-    // ... (هنا يتم التحقق من المبلغ وحفظ الطلب في MongoDB) ...
+if (WEBHOOK_URL) {
+    // A. تعيين مسار Webhook لبوت المستخدمين
+    userBot.setWebHook(WEBHOOK_URL + '/user_updates');
     
-    // لإكمال الملف بشكل دقيق (تم وضع هذا المنطق بالكامل في الردود السابقة)
-    const state = userStates[chatId];
-    if (text === "❌ إلغاء") { delete userStates[chatId]; bot.sendMessage(chatId, "تم الإلغاء.", mainMenu); return; }
+    // B. تعيين مسار Webhook لبوت المدير
+    adminBot.setWebHook(WEBHOOK_URL + '/admin_updates');
 
-    // ... (بقية منطق Amount, Method, Account) ...
+    // C. جعل الخادم يستمع للرسائل القادمة من تليجرام (POST requests)
+    app.post('/user_updates', (req, res) => {
+        userBot.processUpdate(req.body); // تمرير التحديث إلى بوت المستخدمين
+        res.sendStatus(200); // يجب الرد بـ 200 فوراً لتجنب التكرار
+    });
+
+    app.post('/admin_updates', (req, res) => {
+        adminBot.processUpdate(req.body); // تمرير التحديث إلى بوت المدير
+        res.sendStatus(200);
+    });
+} else {
+    console.warn("⚠️ WEBHOOK_URL غير مُعين. البوت يعمل بوضعية Polling (غير مستقرة).");
 }
 
-// **************************************************
-// 4. المشغلات (LISTENERS) - تبقى كما هي
-// **************************************************
+// ... (بقية منطق Express)
 
-// معالج الأوامر النصية والـ state machine
-bot.on('message', async (msg) => {
-    // ... (منطق معالجة الرسائل النصية) ...
-    if (userStates[msg.chat.id]) {
-        handleWithdrawalFlow(msg.chat.id, msg.text, msg);
-        return;
-    }
-    // ... (بقية منطق الرسائل) ...
+app.get('/', (req, res) => {
+    res.status(200).send('✅ AdGain Pro System is Active & Running.');
 });
 
-// معالج النقرات (Callback Queries)
-bot.on('callback_query', async (query) => {
-    // ... (منطق معالجة نقرات الإعلانات والمهام) ...
-});
-
-// تصدير البوت - هذا حاسم لكي يتمكن server.js من إعداد Webhook
-module.exports = bot;
+const PORT = process.env.PORT || 10000; 
+app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
