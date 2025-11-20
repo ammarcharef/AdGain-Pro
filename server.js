@@ -4,27 +4,16 @@ const dotenv = require('dotenv');
 const connectDB = require('./db'); 
 
 // --- تشغيل البوتات ---
-// 1. بوت المستخدمين (واجهة العمل)
-require('./userBot'); 
-// 2. بوت الإدارة (واجهة التحكم وتوزيع المال)
+// نقوم بتشغيل الملفين بشكل منفصل، لأن كل واحد له توكن مختلف الآن
+const userBot = require('./userBot'); 
 require('./adminBot'); 
 
 dotenv.config(); 
 connectDB(); 
 
 const app = express();
-
-// (بقية إعدادات الـ Server والـ Postback تبقى كما هي...)
-app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }));
+app.use(cors());
 app.use(express.json()); 
-
-// مسار استلام الأرباح من الشركات (Postback)
-const User = require('./models/User');
-const USER_SHARE = 0.70; // نسبة المستخدم
-
-app.get('/api/postback/:network', async (req, res) => {
-    // ... (نفس كود الـ Postback الذي كتبناه سابقاً) ...
-});
 
 app.get('/', (req, res) => {
     res.send('🚀 AdGain Pro System (User Bot + Admin Bot) is Running!');
