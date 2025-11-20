@@ -3,31 +3,21 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./db'); 
 
-// 1. تحميل الإعدادات
-dotenv.config(); 
+// 1. تشغيل البوتات (يجب أن يكون لكل منهما توكن مختلف)
+const userBot = require('./userBot'); // بوت المستخدمين
+const adminBot = require('./adminBot'); // بوت الإدارة
 
-// 2. الاتصال بقاعدة البيانات
+dotenv.config(); 
 connectDB(); 
 
-// 3. إعداد خادم Express
 const app = express();
 app.use(cors());
 app.use(express.json()); 
 
-// 4. نقطة نهاية للصحة (Health Check) لضمان بقاء الخادم حياً
+// مسار صحي للبقاء على قيد الحياة (Health Check)
 app.get('/', (req, res) => {
-    res.status(200).send('✅ AdGain Pro System is Active & Running.');
+    res.status(200).send('✅ AdGain Pro Bot System is Active & Running.');
 });
 
-// 5. تشغيل البوت (Import)
-// يتم استدعاؤه هنا ليعمل جنباً إلى جنب مع الخادم
-try {
-    require('./bot');
-    console.log('🤖 Bot Module Loaded Successfully.');
-} catch (error) {
-    console.error('❌ Failed to load Bot Module:', error);
-}
-
-// 6. الاستماع للمنفذ
 const PORT = process.env.PORT || 10000; 
 app.listen(PORT, () => console.log(`🚀 Server started on port ${PORT}`));
