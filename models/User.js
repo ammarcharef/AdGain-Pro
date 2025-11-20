@@ -9,8 +9,8 @@ const UserSchema = new mongoose.Schema({
     level: { type: Number, default: 1 },
     referralCode: { type: String, unique: true },
     referredBy: { type: String, default: null },
-    withdrawalAccount: { type: String, default: null }, 
-    isAdmin: { type: Boolean, default: false }, // صلاحية المدير (يتم تعديلها يدوياً)
+    withdrawalAccount: { type: String, default: null },
+    isAdmin: { type: Boolean, default: false },
     joinedAt: { type: Date, default: Date.now }
 });
 
