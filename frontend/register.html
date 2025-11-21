@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب جديد - AdGain v2</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="card">
+            <h2>انضم إلينا</h2>
+            <p>أنشئ حسابك وابدأ في الكسب اليوم.</p>
+            
+            <div id="alertMsg" class="alert"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" required placeholder="اختر اسماً مميزاً">
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="email" required placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" required placeholder="********">
+                </div>
+                <button type="submit" class="btn">إنشاء الحساب</button>
+            </form>
+            <span class="link">لديك حساب بالفعل؟ <a href="index.html">سجل الدخول</a></span>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>

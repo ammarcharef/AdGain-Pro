@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات الدفع والأمان - AdGain v2</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="card">
+            <h2>إعدادات الدفع والأمان</h2>
+            <div id="alertMsg" class="alert"></div>
+
+            <form id="settingsForm">
+                <p class="alert alert-info">يجب تحديد تفاصيل الدفع وكلمة مرور السحب مرة واحدة قبل إجراء أي عملية سحب.</p>
+
+                <h3>تفاصيل الدفع المسجلة</h3>
+                <label>طريقة الدفع الأساسية:</label>
+                <select id="paymentMethod" required>
+                    <option value="CCP">CCP (بريد الجزائر)</option>
+                    <option value="BANK">تحويل بنكي محلي</option>
+                    <option value="PAYPAL">PayPal</option>
+                </select>
+
+                <label>رقم الحساب / الإيميل:</label>
+                <input type="text" id="paymentAccount" required placeholder="رقم CCP، IBAN، أو إيميل PayPal">
+
+                <h3 style="margin-top: 30px;">إعداد كلمة مرور السحب</h3>
+                <label>تعيين كلمة مرور السحب الجديدة:</label>
+                <input type="password" id="newWithdrawalPass" required placeholder="كلمة مرور سحب قوية">
+                
+                <button type="submit" class="btn btn-success" style="margin-top: 15px;">حفظ وتأكيد الإعدادات</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // جلب البيانات المخزنة مسبقاً لملء حقول الإعدادات
+            fetchProfile().then(user => {
+                if (user) {
+                    const { paymentMethod, paymentAccount } = user;
+                    if (paymentMethod) document.getElementById('paymentMethod').value = paymentMethod;
+                    if (paymentAccount) document.getElementById('paymentAccount').value = paymentAccount;
+                }
+            }).catch(err => console.error("Could not fetch user data for settings."));
+
+            // مُستمع الحدث لنموذج الإعدادات
+            document.getElementById('settingsForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const data = {
+                    paymentMethod: document.getElementById('paymentMethod').value,
+                    paymentAccount: document.getElementById('paymentAccount').value.trim(),
+                    newWithdrawalPass: document.getElementById('newWithdrawalPass').value.trim()
+                };
+                updateProfile(data); // دالة updateProfile من main.js
+            });
+        });
+    </script>
+</body>
+</html>

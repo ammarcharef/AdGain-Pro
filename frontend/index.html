@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdGain v2 - تسجيل الدخول</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS Injected for initial professional styling */
+        :root {
+            --primary-color: #0077b6; /* أزرق عصري */
+            --secondary-color: #00b4d8; 
+            --background-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { width: 100%; max-width: 400px; padding: 20px; }
+        .card { background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+        h2 { color: var(--primary-color); text-align: center; margin-bottom: 25px; }
+        input[type="email"], input[type="password"] { 
+            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; 
+        }
+        .btn-primary { 
+            width: 100%; padding: 12px; background-color: var(--secondary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background-color 0.3s; 
+        }
+        .btn-primary:hover { background-color: #0096c7; }
+        .footer-link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .footer-link a { color: var(--primary-color); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>تسجيل الدخول - AdGain v2</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+                <input type="password" id="password" placeholder="كلمة المرور" required>
+                <button type="submit" class="btn-primary">دخول</button>
+            </form>
+            <div class="footer-link">
+                ليس لديك حساب؟ <a href="register.html">سجل الآن</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
